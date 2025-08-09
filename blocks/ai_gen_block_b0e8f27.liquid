@@ -1,0 +1,507 @@
+{% doc %}
+  @prompt
+    Create a Buy Now button that stands out on the product page, making it easy for customers to make quick purchases. also create add to cart once there is a click on add to cart then you'll get a pop up that added to cart 
+
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-purchase-buttons-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: {{ block.settings.button_spacing }}px;
+    width: 100%;
+    margin-top: {{ block.settings.top_margin }}px;
+    margin-bottom: {{ block.settings.bottom_margin }}px;
+  }
+
+  .ai-button-{{ ai_gen_id }} {
+    position: relative;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: {{ block.settings.button_height }}px;
+    padding: 0 20px;
+    border: none;
+    border-radius: {{ block.settings.button_radius }}px;
+    font-size: {{ block.settings.font_size }}px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .ai-button-{{ ai_gen_id }}:focus {
+    outline: 2px solid #000;
+    outline-offset: 2px;
+  }
+
+  .ai-buy-now-{{ ai_gen_id }} {
+    background-color: {{ block.settings.buy_now_bg_color }};
+    color: {{ block.settings.buy_now_text_color }};
+    {% if block.settings.show_shadow %}
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    {% endif %}
+  }
+
+  .ai-buy-now-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.buy_now_hover_bg_color }};
+    transform: translateY(-2px);
+    {% if block.settings.show_shadow %}
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    {% endif %}
+  }
+
+  .ai-add-to-cart-{{ ai_gen_id }} {
+    background-color: {{ block.settings.add_to_cart_bg_color }};
+    color: {{ block.settings.add_to_cart_text_color }};
+    {% if block.settings.show_border %}
+      border: 2px solid {{ block.settings.border_color }};
+    {% endif %}
+  }
+
+  .ai-add-to-cart-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.add_to_cart_hover_bg_color }};
+  }
+
+  .ai-button-icon-{{ ai_gen_id }} {
+    display: inline-flex;
+    margin-right: 8px;
+  }
+
+  .ai-popup-{{ ai_gen_id }} {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    max-width: 320px;
+    padding: 16px;
+    background-color: {{ block.settings.popup_bg_color }};
+    color: {{ block.settings.popup_text_color }};
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateX(150%);
+    transition: transform 0.4s ease;
+  }
+
+  .ai-popup-{{ ai_gen_id }}.show {
+    transform: translateX(0);
+  }
+
+  .ai-popup-icon-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+    background-color: {{ block.settings.popup_icon_bg_color }};
+    color: {{ block.settings.popup_icon_color }};
+    border-radius: 50%;
+  }
+
+  .ai-popup-content-{{ ai_gen_id }} {
+    flex: 1;
+  }
+
+  .ai-popup-title-{{ ai_gen_id }} {
+    margin: 0 0 4px;
+    font-weight: 600;
+    font-size: 16px;
+  }
+
+  .ai-popup-message-{{ ai_gen_id }} {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .ai-popup-close-{{ ai_gen_id }} {
+    background: none;
+    border: none;
+    color: {{ block.settings.popup_text_color }};
+    cursor: pointer;
+    padding: 4px;
+    margin-left: 8px;
+    opacity: 0.7;
+  }
+
+  .ai-popup-close-{{ ai_gen_id }}:hover {
+    opacity: 1;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-purchase-buttons-{{ ai_gen_id }} {
+      gap: {{ block.settings.button_spacing | divided_by: 1.5 }}px;
+    }
+    
+    .ai-button-{{ ai_gen_id }} {
+      min-height: {{ block.settings.button_height | minus: 4 }}px;
+      font-size: {{ block.settings.font_size | minus: 1 }}px;
+    }
+  }
+{% endstyle %}
+
+<purchase-buttons-{{ ai_gen_id }} 
+  class="ai-purchase-buttons-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+  data-product-id="{{ product.id }}"
+  data-section-id="{{ section.id }}"
+>
+  {% if block.settings.show_buy_now %}
+    <button
+      type="button"
+      class="ai-button-{{ ai_gen_id }} ai-buy-now-{{ ai_gen_id }}"
+      name="buy-now"
+      data-action="buy-now"
+    >
+      {% if block.settings.show_icon %}
+        <span class="ai-button-icon-{{ ai_gen_id }}">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 10V6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6V10M3 10H21L19 22H5L3 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      {% endif %}
+      {{ block.settings.buy_now_text }}
+    </button>
+  {% endif %}
+
+  <button
+    type="button"
+    class="ai-button-{{ ai_gen_id }} ai-add-to-cart-{{ ai_gen_id }}"
+    name="add-to-cart"
+    data-action="add-to-cart"
+  >
+    {% if block.settings.show_icon %}
+      <span class="ai-button-icon-{{ ai_gen_id }}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 3H5L5.4 5M5.4 5H21L17 13H7M5.4 5L7 13M7 13L5.2 17H19M9 20C9 20.5523 8.55228 21 8 21C7.44772 21 7 20.5523 7 20C7 19.4477 7.44772 19 8 19C8.55228 19 9 19.4477 9 20ZM17 20C17 20.5523 16.5523 21 16 21C15.4477 21 15 20.5523 15 20C15 19.4477 15.4477 19 16 19C16.5523 19 17 19.4477 17 20Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+    {% endif %}
+    {{ block.settings.add_to_cart_text }}
+  </button>
+
+  <div class="ai-popup-{{ ai_gen_id }}" aria-live="polite" role="status">
+    <div class="ai-popup-icon-{{ ai_gen_id }}">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 13L9 17L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="ai-popup-content-{{ ai_gen_id }}">
+      <h3 class="ai-popup-title-{{ ai_gen_id }}">{{ block.settings.popup_title }}</h3>
+      <p class="ai-popup-message-{{ ai_gen_id }}">{{ block.settings.popup_message }}</p>
+    </div>
+    <button class="ai-popup-close-{{ ai_gen_id }}" aria-label="Close notification">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</purchase-buttons-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class PurchaseButtons extends HTMLElement {
+      constructor() {
+        super();
+        this.productId = this.getAttribute('data-product-id');
+        this.sectionId = this.getAttribute('data-section-id');
+        this.popup = this.querySelector('.ai-popup-{{ ai_gen_id }}');
+        this.addToCartButton = this.querySelector('[data-action="add-to-cart"]');
+        this.buyNowButton = this.querySelector('[data-action="buy-now"]');
+        this.closePopupButton = this.querySelector('.ai-popup-close-{{ ai_gen_id }}');
+        this.popupTimeout = null;
+      }
+
+      connectedCallback() {
+        if (this.addToCartButton) {
+          this.addToCartButton.addEventListener('click', this.handleAddToCart.bind(this));
+        }
+        
+        if (this.buyNowButton) {
+          this.buyNowButton.addEventListener('click', this.handleBuyNow.bind(this));
+        }
+        
+        if (this.closePopupButton) {
+          this.closePopupButton.addEventListener('click', this.hidePopup.bind(this));
+        }
+      }
+
+      handleAddToCart(event) {
+        event.preventDefault();
+        
+        // Get the form element that contains the variant selection
+        const form = document.querySelector('form[action$="/cart/add"]');
+        if (!form) return;
+        
+        const formData = new FormData(form);
+        
+        // Add the item to the cart using fetch
+        fetch('/cart/add.js', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          this.showPopup();
+        })
+        .catch(error => {
+          console.error('Error adding item to cart:', error);
+        });
+      }
+
+      handleBuyNow(event) {
+        event.preventDefault();
+        
+        // Get the form element that contains the variant selection
+        const form = document.querySelector('form[action$="/cart/add"]');
+        if (!form) return;
+        
+        const formData = new FormData(form);
+        
+        // Add the item to the cart using fetch
+        fetch('/cart/add.js', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Redirect to checkout
+          window.location.href = '/checkout';
+        })
+        .catch(error => {
+          console.error('Error processing buy now:', error);
+        });
+      }
+
+      showPopup() {
+        // Clear any existing timeout
+        if (this.popupTimeout) {
+          clearTimeout(this.popupTimeout);
+        }
+        
+        // Show the popup
+        this.popup.classList.add('show');
+        
+        // Set a timeout to hide the popup after 5 seconds
+        this.popupTimeout = setTimeout(() => {
+          this.hidePopup();
+        }, 5000);
+      }
+
+      hidePopup() {
+        this.popup.classList.remove('show');
+      }
+    }
+
+    customElements.define('purchase-buttons-{{ ai_gen_id }}', PurchaseButtons);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Enhanced Buy Buttons",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Button Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_buy_now",
+      "label": "Show Buy Now button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "buy_now_text",
+      "label": "Buy Now text",
+      "default": "Buy Now"
+    },
+    {
+      "type": "text",
+      "id": "add_to_cart_text",
+      "label": "Add to Cart text",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_icon",
+      "label": "Show button icons",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "button_height",
+      "min": 40,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Button height",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Button corner radius",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "button_spacing",
+      "min": 8,
+      "max": 32,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between buttons",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "top_margin",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "Top margin",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "bottom_margin",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom margin",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Buy Now Button Style"
+    },
+    {
+      "type": "color",
+      "id": "buy_now_bg_color",
+      "label": "Background color",
+      "default": "#000f9f"
+    },
+    {
+      "type": "color",
+      "id": "buy_now_hover_bg_color",
+      "label": "Hover background color",
+      "default": "#000080"
+    },
+    {
+      "type": "color",
+      "id": "buy_now_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_shadow",
+      "label": "Show shadow",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Add to Cart Button Style"
+    },
+    {
+      "type": "color",
+      "id": "add_to_cart_bg_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "add_to_cart_hover_bg_color",
+      "label": "Hover background color",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "add_to_cart_text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_border",
+      "label": "Show border",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#dddddd"
+    },
+    {
+      "type": "header",
+      "content": "Added to Cart Popup"
+    },
+    {
+      "type": "text",
+      "id": "popup_title",
+      "label": "Popup title",
+      "default": "Added to Cart"
+    },
+    {
+      "type": "text",
+      "id": "popup_message",
+      "label": "Popup message",
+      "default": "Your item has been added to the cart"
+    },
+    {
+      "type": "color",
+      "id": "popup_bg_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "popup_text_color",
+      "label": "Text color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "popup_icon_bg_color",
+      "label": "Icon background color",
+      "default": "#4CAF50"
+    },
+    {
+      "type": "color",
+      "id": "popup_icon_color",
+      "label": "Icon color",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Enhanced Buy Buttons"
+    }
+  ]
+}
+{% endschema %}
